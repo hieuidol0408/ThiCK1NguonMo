@@ -1,0 +1,46 @@
+name: Python CI/CD
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "project-python/**"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "project-python/**"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./project-python
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: pytest
+
+  deploy:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Production
+        run: echo "Deploying Python project..."
+        # Example: Curl to Render Deploy Hook
+        # run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_PYTHON }}
