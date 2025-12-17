@@ -41,6 +41,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to Production
-        run: echo "Deploying Python project..."
         # Example: Curl to Render Deploy Hook
-        # run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_PYTHON }}
+        run: |
+          if [ -n "${{ secrets.RENDER_DEPLOY_HOOK_PYTHON }}" ]; then
+            curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_PYTHON }}
+          else
+            echo "RENDER_DEPLOY_HOOK_PYTHON secret not found. Skipping auto-deploy trigger."
+          fi

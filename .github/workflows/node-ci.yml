@@ -13,7 +13,6 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: ./project-node
@@ -26,20 +25,14 @@ jobs:
         with:
           node-version: "18.x"
           cache: "npm"
-          cache-dependency-path: project-node/package-lock.json
+          cache-dependency-path: "project-node/package-lock.json"
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run tests
         run: npm test
 
-  deploy:
-    needs: build-and-test
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to Production
-        run: echo "Deploying Node.js project..."
-        # Example: Curl to Render Deploy Hook
-        # run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_NODE }}
+  # Vercel deployment is typically handled via their GitHub App integration,
+  # but we can add a placeholder here or use the Vercel CLI action if desired.
+  # For this specific assignment, Vercel's automatic Git integration is the standard.

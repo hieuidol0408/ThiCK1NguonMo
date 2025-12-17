@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: final-exam-python
+    env: python
+    region: singapore
+    plan: free
+    buildCommand: |
+      cd project-python
+      pip install -r requirements.txt
+    startCommand: |
+      cd project-python
+      python app.py
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHON_VERSION
+        value: 3.9.13

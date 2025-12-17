@@ -1,67 +1,65 @@
-# Deployment Guide for Final Exam
+# Hướng Dẫn Deploy (Final Exam)
 
-This guide explains how to deploy your two projects (`project-node` and `project-python`) using the provided GitHub Actions workflows.
+Dự án này bao gồm 2 phần được deploy trên 2 nền tảng khác nhau để đáp ứng yêu cầu:
 
-## Prerequisites
+1.  **Backend (Python/Flask)**: Deploy lên **Render**.
+2.  **Frontend (Node.js)**: Deploy lên **Vercel**.
 
-1.  **GitHub Account**: You already have this.
-2.  **Cloud Hosting Account**: Recommended free tiers:
-    - **Render.com** (Best for both Node and Python backends).
-    - **Vercel** (Good for Frontend/Node, supporting Python serverless).
-    - **Glitch** (Good for Node).
-    - **PythonAnywhere** (Good for Python).
+---
 
-## Option 1: Deploying to Render (Recommended for simplicity)
+## 1. Deploy Backend (Python) lên Render
 
-### A. Setup `project-node` on Render
+Render là nền tảng Cloud phù hợp cho Backend và Docker.
 
-1.  Log in to [Render.com](https://render.com/).
-2.  Click **New +** -> **Web Service**.
-3.  Connect your GitHub repository `ThiCK1NguonMo`.
-4.  Scrolldown to configure:
-    - **Root Directory**: `project-node`
-    - **Runtime**: Node
-    - **Build Command**: `npm install`
-    - **Start Command**: `node server.js`
-5.  Click **Create Web Service**.
-6.  **Copy the Deploy Hook**:
-    - Go to **Settings** -> **Deploy Hook**.
-    - Copy the URL (it looks like `https://api.render.com/deploy/srv-...`).
-    - Go to your **GitHub Repo Settings** -> **Secrets and variables** -> **Actions**.
-    - Add a new Repository Secret named `RENDER_DEPLOY_HOOK_NODE` and paste the URL.
+**Các bước thực hiện:**
 
-### B. Setup `project-python` on Render
+1.  Truy cập [Render Dashboard](https://dashboard.render.com/) và đăng nhập (bằng GitHub).
+2.  Chọn **New +** -> **Web Service**.
+3.  Chọn **Build and deploy from a Git repository**.
+4.  Kết nối với Repository `ThiCK1NguonMo` của bạn.
+5.  Render sẽ tự động phát hiện file `render.yaml` trong source code của bạn và điền sẵn cấu hình:
+    - **Name**: `final-exam-python`
+    - **Environment**: `Python`
+    - **Build Command**: `cd project-python && pip install -r requirements.txt`
+    - **Start Command**: `cd project-python && python app.py`
+6.  Bấm **Create Web Service**.
 
-1.  Click **New +** -> **Web Service**.
-2.  Connect the same repository.
-3.  Configuration:
-    - **Root Directory**: `project-python`
-    - **Runtime**: Python 3
-    - **Build Command**: `pip install -r requirements.txt`
-    - **Start Command**: `gunicorn app:app` (Render might need `gunicorn` added to requirements.txt, or use `python app.py` if just testing)
-      - _Note: For production, `gunicorn` is better. Added to requirements.txt just in case._
-4.  Click **Create Web Service**.
-5.  **Copy the Deploy Hook**:
-    - Go to **Settings** -> **Deploy Hook**.
-    - Copy the URL.
-    - Add a new Repository Secret named `RENDER_DEPLOY_HOOK_PYTHON` and paste the URL.
+**Thiết lập Auto-Deploy (CI/CD):**
 
-## Option 2: Verifying CI/CD without Cloud Deploy
+1.  Trong trang Settings của dịch vụ vừa tạo trên Render, tìm mục **Deploy Hook**.
+2.  Copy URL của Deploy Hook (ví dụ: `https://api.render.com/deploy/srv-xxxxx?key=xxxxx`).
+3.  Vào GitHub Repo -> **Settings** -> **Secrets and variables** -> **Actions**.
+4.  Tạo New Repository Secret:
+    _ Name: `RENDER_DEPLOY_HOOK_PYTHON`
+    _ Value: (Dán URL vừa copy vào).
+    -> Bất cứ khi nào bạn push code vào `main`, GitHub Action sẽ chạy test và gọi hook này để Render build lại server mới nhất.
 
-If you just want to see the GitHub Actions run successfully (Green Checkmark):
+---
 
-1.  Push the code to GitHub:
-    ```bash
-    git add .
-    git commit -m "Complete final exam exercise"
-    git push origin main
-    ```
-2.  Go to the **Actions** tab in your GitHub repository.
-3.  You will see two workflows running: `Node.js CI/CD` and `Python CI/CD`.
-4.  They should fail on the "Deploy" step if you haven't set the Secrets, or just "echo" success if you kept my echo command. (Currently, they just "echo", so they will PASS green).
+## 2. Deploy Frontend (Node.js) lên Vercel
 
-## How to Submit
+Vercel là nền tảng tối ưu nhất cho Frontend và Static Site.
 
-1.  Take screenshots of the **Code structure**.
-2.  Take screenshots of the **Actions tab** showing all green checks.
-3.  (Optional) Send the link to the live deployed sites if you did the Render setup.
+**Các bước thực hiện:**
+
+1.  Truy cập [Vercel Dashboard](https://vercel.com/dashboard) và đăng nhập (bằng GitHub).
+2.  Bấm **Add New...** -> **Project**.
+3.  Ở mục **Import Git Repository**, chọn Repo `ThiCK1NguonMo` và bấm **Import**.
+4.  Ở màn hình **Configure Project**:
+    - **Project Name**: `final-exam-node` (hoặc tên tùy thích).
+    - **Root Directory**: Bấm **Edit** và chọn folder `project-node`. (Bước này QUAN TRỌNG).
+    - **Framework Preset**: Chọn **Other** (hoặc để Vercel tự phát hiện).
+    - **Build Command**: `npm install` (hoặc để trống nếu project đơn giản).
+    - **Output Directory**: `public` (Vì file html nằm ở đây).
+5.  Bấm **Deploy**.
+
+**Kết quả:**
+Vercel sẽ cấp cho bạn một domain (ví dụ: `final-exam-node.vercel.app`).
+
+---
+
+## 3. Kiểm thử kết quả
+
+- **GitHub Actions**: Vào tab "Actions" trên GitHub để xem quy trình test tự động chạy (xanh lá cây là OK).
+- **Web**: Truy cập vào link Vercel để xem Frontend.
+- **API**: Truy cập vào link Render để xem Backend.
